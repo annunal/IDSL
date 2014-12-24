@@ -1,7 +1,7 @@
 title         = Raspberry:
 location      = Ispra labs
 position      = 45.810255, 8.631245
-IDdevice      = IDSL-01
+IDdevice      = $HOSTNAME 
 SaveURL       = http://webcritech.jrc.ec.europa.eu/TAD_server/EnterData.aspx?idDevice$EQ$IDdevice&log$EQ\$S$IDdevice,$DATE,$TIME,$TEMP,$PRESS,$LEV,$FORE30,$FORE300,$RMS,$ALERT_LEVEL,$ALERT_SIGNAL,$V1,$V2,\$E
 AlertURL      = http://webcritech.jrc.ec.europa.eu/TAD_server/EnterAlert.aspx?idDevice$EQ$IDdevice&AlertLevel$EQ$ALERT_SIGNAL&DateTime$EQ$DATE $TIME&SignalType$EQTAD&AlertType$EQAUTO&Lev$EQ$LEV
 Interval      = 5 
