@@ -25,3 +25,14 @@ git pull -a ? xx specificare...
 
 Attention:
 with the config file present here the name is taken from the hostname that must be set to the deviceID
+
+
+Launch programme:
+  sudo ./tad
+
+to retransmit today data:
+  sudo ./tad retry
+
+to retransmit a specific file, related to dd/mm/yyyy 
+  sudo ./tad retry retry_yyyy-mm-dd.txt
+
