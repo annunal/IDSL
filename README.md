@@ -22,3 +22,6 @@ git remote add idsl https://github.com/annunal/IDSL.git
 
 to sync at the beginning
 git pull -a ? xx specificare...
+
+Attention:
+with the config file present here the name is taken from the hostname that must be set to the deviceID
