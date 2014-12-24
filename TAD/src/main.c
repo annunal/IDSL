@@ -12,7 +12,6 @@
 #include <termios.h>
 #include <curl/curl.h>
 #include "tad.h"
-
 /* size of the event structure, not counting name */
 #define EVENT_SIZE  (sizeof (struct inotify_event))
 
@@ -207,10 +206,15 @@ void parseLine(char * line)
                 strcpy(Configuration.AlertURL, value);
 		            return;
         }
-                if (strcasecmp(label,"IDdevice") == 0)
-        {
-                strcpy(Configuration.IDdevice, value);
-		            return;
+        if (strcasecmp(label,"IDdevice") == 0)
+        {   if (strcasecmp(value,"$HOSTNAME") == 0)
+			{
+				char hostname[200];
+				int er=gethostname(hostname,sizeof(hostname));
+				strcpy(value,hostname);
+			}
+            strcpy(Configuration.IDdevice, value);
+		        return;
         }
 
         if (!strcasecmp(label,"title")) {
@@ -348,14 +352,28 @@ void readConfiguration(char * inputFile)
         printf("\n\nEnd of Reading file: %s\n",inputFile);
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   struct sensorGrid readings;
   int fd, wd, idx;
   char fullname[FILENAME_MAX], tmpname[FILENAME_MAX], logCommands[4096];
-
+  char hostname[200];
+  int er=gethostname(hostname,sizeof(hostname));
+  printf("Hostname=%s\n",hostname);
   readConfiguration(CONFIGFILENAME);
-
+  
+  if (argc==2) 
+  {
+	if (strcasecmp(argv[1],"retry")==0)
+	{
+		char dateName[32], currDate[32];
+		time_t now = (time_t) time(0);
+		struct tm *gmtm = (struct tm *) gmtime(&now);
+		strftime(dateName, sizeof(dateName), "retry_%Y-%m-%d.txt", gmtm);
+		retryToTransmit(dateName);
+		return;
+	}
+  }
   //if(argc != 3 && argc != 4) {
     //fprintf(stderr, "Usage: %s foldername filename [output]\n", argv[0]);
     //return 1;
@@ -578,4 +596,59 @@ void printRetry(char *line)
 	fprintf(logFile,"echo \"%s\"\n",currDate);
 	fprintf(logFile,"%s\n",line);
 	fclose(logFile);
+}
+
+void retryToTransmit(char * fname)
+{
+        FILE * infile;
+        char line[1000];
+		char dummy[1000];
+		if(!fileExists(fname)) return;
+
+		system("rm -f retryStore1.txt");
+        if((infile = fopen(fname, "r")) == NULL) {
+                printf("File retryStore1.txt does not exists retryStore.txt\n");
+                return;
+                }
+
+        int isConnected=TRUE;
+        FILE * retryStore1=fopen("retryStore1.txt", "w");
+        while( fgets(line, sizeof(line), infile) != NULL ) {
+                //printf("line x: %s\n",line);
+			if( !strstr(line, "echo") && line[0] !=10	)
+			{
+				if (isConnected ) 
+				{ // && strcasecmp(line[0],"e") != 0) { 
+					printf("RETR: %s\n",line);
+					system(line);
+					if ( fileContains("outlogwget.txt","EnterData.aspx") || fileContains("outlogwget.txt","EnterAlert.aspx") )
+							{ 
+							system("rm -f EnterData.aspx*");
+							printf("Transmitted\n");
+							//LastTimeConnected_s = CurrentTime_s;
+
+							}
+					else if ( fileContains("outlogwget.txt","EnterAlert.aspx") )
+							{ 
+							system("rm -f EnterAlert.aspx*");
+							printf("Transmitted\n");
+							//LastTimeConnected_s = CurrentTime_s;
+							}
+					else
+                        { isConnected=FALSE ;
+						  printf("Not transmitted, stored/n");
+                          fprintf(retryStore1, "%s\n",line);
+                        }
+				}
+				else
+				     fprintf(retryStore1, "%s\n",line);
+			}
+        }
+        fclose(retryStore1);
+		fclose(infile);
+        if (fileExists("retryStore1.txt"))
+			sprintf(dummy,"mv retryStore1.txt %s",fname);
+			system(dummy);
+		
+        
 }

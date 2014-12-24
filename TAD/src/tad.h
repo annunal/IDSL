@@ -53,6 +53,7 @@ void addMeasure(struct sensorGrid *grid, double time0);
 void writeStatus();
 void printLog( char * line );
 void printRetry(char *line) ;
+void retryToTransmit(char * fname);
 
 typedef struct {
         char title[PATH_MAX];

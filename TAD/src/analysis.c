@@ -139,53 +139,6 @@ int fileContains(char * fname, char * searchText)
 	return found;
 }
 
-void retryToTransmit()
-{
-        FILE * infile;
-        char line[1000];
-		char dummy[1000];
-		if(!fileExists("retryStore.txt")) return;
-
-		system("rm -f retryStore1.txt");
-        if((infile = fopen("retryStore.txt", "r")) == NULL) {
-                printf("File retryStore1.txt does not exists retryStore.txt\n");
-                return;
-                }
-
-        int isConnected=TRUE;
-        FILE * retryStore1=fopen("retryStore1.txt", "w");
-        while( fgets(line, sizeof(line), infile) != NULL ) {
-                //printf("line x: %s\n",line);
-
-                if (isConnected) { 
-					printf("RETR: %s\n",line);
-					system(line);
-					if ( fileContains("outlogwget.txt","EnterData.aspx") || fileContains("outlogwget.txt","EnterAlert.aspx") )
-							{ 
-							system("rm -f EnterData.aspx*");
-							LastTimeConnected_s = CurrentTime_s;
-
-							}
-					else if ( fileContains("outlogwget.txt","EnterAlert.aspx") )
-							{ 
-							system("rm -f EnterAlert.aspx*");
-							LastTimeConnected_s = CurrentTime_s;
-							}
-					else
-                        { isConnected=FALSE ;
-                          fprintf(retryStore1, "%s\n",line);
-                        }
-					}
-					else
-					     fprintf(retryStore1, "%s\n",line);
-        }
-        fclose(retryStore1);
-		fclose(infile);
-        if (fileExists("retryStore1.txt"))
-			system("mv retryStore1.txt retryStore.txt");
-		
-        
-}
 
 void addMeasure(struct sensorGrid *grid, double time00)
 {
