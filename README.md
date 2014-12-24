@@ -14,7 +14,7 @@ git commit -m "comment for this upload"
 git push idsl master
 <provide user/pwd when requested>
 
-to sync files</br>
+to sync files<br>
 <b>git pull idsl master</b>
 
 at the beginning, to define the remote file repository
@@ -27,12 +27,12 @@ Attention:
 with the config file present here the name is taken from the hostname that must be set to the deviceID
 
 
-Launch programme:</br>
+Launch programme:<br>
   <b>sudo ./tad</b>
 
-to retransmit today data:</br>
+to retransmit today data:<br>
   <b>sudo ./tad retry</b>
 
-to retransmit a specific file, related to dd/mm/yyyy </br>
+to retransmit a specific file, related to dd/mm/yyyy <br>
   <b>sudo ./tad retry retry_yyyy-mm-dd.txt</b>
 
