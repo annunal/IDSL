@@ -1,3 +1,5 @@
 cd /home/pi/programs/TAD
-echo date >> execLog.txt
-sudo nice ./tad >> execLog.txt
+NOW=$(date +"%Y-%m-%d")
+FILE="execLog_$NOW.txt"
+echo $date >> $FILE
+sudo nice ./tad  >> $FILE 

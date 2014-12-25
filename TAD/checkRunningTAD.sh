@@ -1,6 +1,8 @@
 #! /bin/bash
+NOW=$(date +"%Y-%m-%d")
+FILE="checkLog_$NOW.txt"
 
-logfile="/home/pi/programs/TAD/checkLog.txt"
+logfile="/home/pi/programs/TAD/$FILE"
 
 case "$(pidof tad | wc -w)" in
 
