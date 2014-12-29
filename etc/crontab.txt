@@ -25,7 +25,7 @@
 #0  0    *   *   *  /home/pi/programs/routerReboot.sh
 
 # reboot at 0 and 12 every day
-0    0,12    *   *   /sbin/shutdown -r now
+0   0,12 *   *   *   /sbin/shutdown -r now
 
 #check if tad is running
 */2   *   *   *   *  /home/pi/programs/TAD/checkRunningTAD.sh

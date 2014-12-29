@@ -19,7 +19,7 @@ Serial        = /dev/ttyUSB0
 BaudRate      = 9600
 xCommands      = /dev/ttyUSB1
 
-xgpsSerial     = /dev/ttyACM0
+xgpsSerial     = /dev/ttyAMA0
 gpsRate       = 9600
 gpsURL        = http://webcritech.jrc.ec.europa.eu/TAD_server/EnterData.aspx?idDevice$EQ$IDdevice&lon$EQ$LON&lat$EQ$LAT&hei$EQ$HEI
 gpsDeltaTSave = 300

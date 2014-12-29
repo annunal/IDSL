@@ -145,7 +145,7 @@ void addMeasure(struct sensorGrid *grid, double time00)
 	struct tm *gmtm;
 	float sensorValue = grid->distance*multFac+addFac;
 	int offset300, offset30;
-	static char dummyD[32], logLine[1024];
+	static char dummyD[32], logLine[1024],TimeString[32],DateString[32],HourString[32];
 	double forecast30 = 0;
 	double forecast300 = 0;
 	float rms30 = 0.0;
@@ -239,31 +239,26 @@ void addMeasure(struct sensorGrid *grid, double time00)
 
 		if(*saveURL)
 		{
-			//char * saveURL0 = (char *) calloc(4096, sizeof(char));
-			//char * dummy = (char *) calloc(4096, sizeof(char));
-			//char * dummy1 = (char *) calloc(4096, sizeof(char)), *t;
 			char saveURL0[4096];
 			char dummy[4096];
 			char dummy1[4096], *t;
-
 			success = 'T';
 
 			strcpy(saveURL0,saveURL);
 
-			strftime(dummyD, sizeof(dummyD), "%d/%m/%Y %H:%M:%S", gmtm);
+			strftime(TimeString, sizeof(TimeString), "%d/%m/%Y %H:%M:%S", gmtm);
+			strftime(DateString, sizeof(DateString), "%d/%m/%Y", gmtm);
+			strftime(HourString, sizeof(HourString), "%H:%M:%S", gmtm);
 
-//			printf("%s, %f, %f, %f, %i, %i, %i, %f, %f, %i \n",dummyD,Tot,forecast30,forecast300,alertValue,index300,index1,rms,alertSignal,Npoints);
 			fflush(stdout);
-			FILE * log = fopen("/tmp/calc.log", "w");
-			if(log != NULL){
-				fprintf(log, "%s, %f, %f, %f, %i, %i, %i, %f, %f, %i \n",dummyD,Tot,forecast30,forecast300,alertValue,index300,index1,rms,alertSignal,Npoints);
-				fclose(log);
-			}
+//			FILE * log = fopen("/tmp/calc.log", "w");
+//			if(log != NULL){
+//				fprintf(log, "%s, %f, %f, %f, %i, %i, %i, %f, %f, %i \n",TimeString,Tot,forecast30,forecast300,alertValue,index300,index1,rms,alertSignal,Npoints);
+//				fclose(log);
+//			}
 
-			strftime(dummyD, sizeof(dummyD), "%d/%m/%Y", gmtm);
-			replace(saveURL0,"$DATE",dummyD,dummy); strcpy(saveURL0, dummy);
-			strftime(dummyD, sizeof(dummyD), "%H:%M:%S", gmtm);
-			replace(saveURL0,"$TIME",dummyD,dummy); strcpy(saveURL0, dummy);
+			replace(saveURL0,"$DATE",DateString,dummy); strcpy(saveURL0, dummy);
+			replace(saveURL0,"$TIME",HourString,dummy); strcpy(saveURL0, dummy);
 
 			sprintf(dummy1,"%f",sensorValue);
 			replace(saveURL0,"$LEV", dummy1,dummy); strcpy(saveURL0, dummy);
@@ -297,29 +292,14 @@ void addMeasure(struct sensorGrid *grid, double time00)
 			if ( fileContains("outlogwget.txt","EnterData.aspx"))
 			{
 				system("rm -f outlogwget.txt* EnterData.aspx*");
-				//retryToTransmit();  // se sono riuscito a trasmettere, provo a ritrasmettere quelli non riusciti
 				LastTimeConnected_s = CurrentTime_s;
-
 			}
 			else
 			{  // se non sono riuscito a trasmettere salvo nel file retrysStore.txt i comandi da dare e poi riprovare.
 				printRetry(dummy);
-				//FILE * retryStore = fopen(RETRY_BUFFER, "a");
-                                //printf("string stored %s\n",dummy);
-				//if(retryStore)
-				//{
-				//	fprintf(retryStore, "%s\n",dummy);
-				//	fclose(retryStore);
 					success = 'S';
-				//}
 			}
 		}
-		else
-		{	
-//			printf("%f, %f, %f, %f, %i, %i, %f, %f, %f \n",time0,Tot,forecast30,forecast300,alertValue,index300,rms30,rms,alertSignal);
-		}
-   //                   If (alertValue > 5 Or True) And alertURL <> "" And alertURL <> "none" Then
-   //                     If Now.ToOADate - alertingTime.tooadate > 30 / 60 / 24 Or alertValue > 5 Then
 
 		if (*alertURL && alertValue>5 && (CurrentTime_s-LastTimeAlert_s)>5*60)
 		{
@@ -330,15 +310,9 @@ void addMeasure(struct sensorGrid *grid, double time00)
 			success = 'T';
       		LastTimeAlert_s=CurrentTime_s;
 			strcpy(alertURL0,alertURL);
-
-			strftime(dummyD, sizeof(dummyD), "%d/%m/%Y %H:%M:%S", gmtm);
-
-//			printf("%s, %f, %f, %f, %i, %i, %i, %f, %f, %i \n",dummyD,Tot,forecast30,forecast300,alertValue,index300,index1,rms,alertSignal,Npoints);
-//			fflush(stdout);
-			strftime(dummyD, sizeof(dummyD), "%d/%m/%Y", gmtm);
-			replace(alertURL0,"$DATE",dummyD,dummy); strcpy(alertURL0, dummy);
-			strftime(dummyD, sizeof(dummyD), "%H:%M:%S", gmtm);
-			replace(alertURL0,"$TIME",dummyD,dummy); strcpy(alertURL0, dummy);
+			
+			replace(alertURL0,"$DATE",DateString,dummy); strcpy(alertURL0, dummy);
+			replace(alertURL0,"$TIME",HourString,dummy); strcpy(alertURL0, dummy);
 
 			sprintf(dummy1,"%f",sensorValue);
 			replace(alertURL0,"$LEV", dummy1,dummy); strcpy(alertURL0, dummy);
@@ -356,35 +330,19 @@ void addMeasure(struct sensorGrid *grid, double time00)
 			if ( fileContains("outlogwget.txt","EnterAlert.aspx"))
 			{
 				system("rm -f outlogwget.txt* EnterAlert.aspx*");
-				//retryToTransmit();  // se sono riuscito a trasmettere, provo a ritrasmettere quelli non riusciti
 				LastTimeConnected_s = CurrentTime_s;
 			}
 			else
 			{  // se non sono riuscito a trasmettere salvo nel file retrysStore.txt i comandi da dare e poi riprovare.
 				printRetry(dummy);
-				//FILE * retryStore = fopen(RETRY_BUFFER, "a");
-                //printf("string stored %s\n",dummy);
-				//if(retryStore)
-				//{
-				//	fprintf(retryStore, "%s\n",dummy);
-				//	fclose(retryStore);
-					success = 'S';
-				//}
+				success = 'S';
 			}
 		}
-		if (CurrentTime_s - LastTimeConnected_s> NOCONNECTION_TIME_MIN * 60) {
-			// se per 5 minuti non ho connessione faccio reboot del server, uno dei due comandi qui sotto per fare reboot del Teltonika
-			system("sshpass -p 'Ecml2011' ssh root@192.168.1.1 -o StrictHostKeyChecking=no \"reboot\" ");
-				//system("sshpass -p 'Ecml2011' ssh root@192.168.1.1 -o StrictHostKeyChecking=no \"shutdown -r now\" ")
-				LastTimeConnected_s = CurrentTime_s + NOCONNECTION_TIME_MIN * 60;  //reset no connection timer to avoid continous reboot
-		}
 
-		strftime(dummyD, sizeof(dummyD), "%d/%m/%Y %H:%M:%S", gmtm);
 		sprintf(logLine, "%s, %f, %f, %f, %f, %f, %i, %i, %f, %f, %f, %d, %f, %f, %c\n",
-			dummyD,Tot,grid->pressure,grid->temperature,forecast30,forecast300,alertValue,index300,rms30,rms,alertSignal,Npoints,
+			TimeString,Tot,grid->pressure,grid->temperature,forecast30,forecast300,alertValue,index300,rms30,rms,alertSignal,Npoints,
 			grid->batteryVoltage, grid->panelVoltage, success);
 		printLog(logLine);
-		//printf("-1-:%s\n",logLine);
 		fflush(stdout);
 
 		Tot = 0; 

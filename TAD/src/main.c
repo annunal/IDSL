@@ -362,14 +362,17 @@ int main(int argc, char *argv[])
   printf("Hostname=%s\n",hostname);
   readConfiguration(CONFIGFILENAME);
   
-  if (argc==2) 
+  if (argc>=2) 
   {
 	if (strcasecmp(argv[1],"retry")==0)
-	{
-		char dateName[32], currDate[32];
-		time_t now = (time_t) time(0);
-		struct tm *gmtm = (struct tm *) gmtime(&now);
-		strftime(dateName, sizeof(dateName), "retry_%Y-%m-%d.txt", gmtm);
+	{   char dateName[32], currDate[32];
+		if(argc==3) strcpy(dateName,argv[2]);
+		else {
+			
+			time_t now = (time_t) time(0);
+			struct tm *gmtm = (struct tm *) gmtime(&now);
+			strftime(dateName, sizeof(dateName), "retry_%Y-%m-%d.txt", gmtm);
+			}
 		retryToTransmit(dateName);
 		return;
 	}
