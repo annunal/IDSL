@@ -344,7 +344,7 @@ void addMeasure(struct sensorGrid *grid, double time00)
 			grid->batteryVoltage, grid->panelVoltage, success);
 		printLog(logLine);
 		fflush(stdout);
-
+   writeFTPData(100, logLine);
 		Tot = 0; 
 		Npoints = 0;
 		LastTimeOut = CurrentTime_s;
@@ -431,6 +431,32 @@ void readBuffer(char * fullname)
 	
 }
 
+void writeFTPData(int NmaxDATA, char * newDATAline)
+{
+	FILE *infile, *outfile;
+	char line[400],dummy[1000];
+    //  1 if file exists read NmaxDATA
+		 if(fileExists("ftpDATA.txt")) 
+		system("cp -r ftpDATA.txt ftpDATA0.txt");
+
+	 outfile=fopen("ftpDATA.txt","w");
+	 fprintf(outfile,"%s",newDATAline);
+	 if(fileExists("ftpDATA0.txt")) {
+		infile=fopen("ftpDATA0.txt","r");
+		int i = -1;
+		while( fgets(line, sizeof(line), infile) != NULL ) 
+		{
+			 i = i+1;
+			 if(i<=NmaxDATA)
+				fprintf(outfile,"%s",line);
+				fflush(outfile);
+			
+		}
+		fclose(infile);
+		system("rm -f ftpDATA0.txt"); 
+	}
+	fclose(outfile);
+}
 
 
 //  MATH CALCULATIONS //

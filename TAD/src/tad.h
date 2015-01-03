@@ -54,6 +54,7 @@ void writeStatus();
 void printLog( char * line );
 void printRetry(char *line) ;
 void retryToTransmit(char * fname);
+void writeFTPData(int NmaxDATA, char * newDATAline);
 
 typedef struct {
         char title[PATH_MAX];
