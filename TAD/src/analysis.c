@@ -339,13 +339,15 @@ void addMeasure(struct sensorGrid *grid, double time00)
 			}
 		}
 
-		sprintf(logLine, "%s, %f, %f, %f, %f, %f, %i, %i, %f, %f, %f, %d, %f, %f, %c\n",
-			TimeString,Tot,grid->pressure,grid->temperature,forecast30,forecast300,alertValue,index300,rms30,rms,alertSignal,Npoints,
+		sprintf(logLine, "%s, %f, %f, %f, %f, %f, %f,  %i, %d, %f, %f, %c\n",
+			TimeString,Tot,forecast30,forecast300,rms30,rms,alertSignal,alertValue,Npoints,
 			grid->batteryVoltage, grid->panelVoltage, success);
 		printLog(logLine);
 		fflush(stdout);
-   writeFTPData(100, logLine);
-		Tot = 0; 
+		writeFTPData(100, logLine);
+		sprintf(logLine, "%s, %f, %f\n",TimeString,Tot,grid->batteryVoltage);
+		writeGTSData(100, logLine);
+			Tot = 0; 
 		Npoints = 0;
 		LastTimeOut = CurrentTime_s;
 		saveBuffer("buffer.txt",index300,index1);
@@ -428,9 +430,9 @@ void readBuffer(char * fullname)
 		{ index300=-1;index1=-1;}
 	}
 	fclose(infile);
-	
+	 
 }
-
+ 
 void writeFTPData(int NmaxDATA, char * newDATAline)
 {
 	FILE *infile, *outfile;
@@ -440,24 +442,61 @@ void writeFTPData(int NmaxDATA, char * newDATAline)
 		system("cp -r ftpDATA.txt ftpDATA0.txt");
 
 	 outfile=fopen("ftpDATA.txt","w");
+   
+   fprintf(outfile,"# deviceID=%s\n",Configuration.IDdevice);
+   fprintf(outfile,"#  Position lat/lon=%s  Location: %s\n", Configuration.position,Configuration.location);
+   fprintf(outfile,"# Server=%s\n",Configuration.title);
+   fprintf(outfile,"# Time(UTC), Lev RAD (m), dummy,dummy,forecast30 (m),forecast300 (m),Alert (-),nmax,rms (m),alert Signal (m),Np,Battery (V), Panel (V), status\n");
+   //04/01/2015 07:49:50, 2.776303, 0.000000, 0.000000, 2.776227, 2.777168, 0, 600, 0.000766, 0.000464, 0.000941, 6, 11.638984, -1.000000, T
 	 fprintf(outfile,"%s",newDATAline);
 	 if(fileExists("ftpDATA0.txt")) {
 		infile=fopen("ftpDATA0.txt","r");
-		int i = -1;
+		int i = 0;
 		while( fgets(line, sizeof(line), infile) != NULL ) 
 		{
 			 i = i+1;
-			 if(i<=NmaxDATA)
+			 if(i<=NmaxDATA && line[0] != '#')
 				fprintf(outfile,"%s",line);
 				fflush(outfile);
 			
 		}
-		fclose(infile);
+		fclose(infile); 
 		system("rm -f ftpDATA0.txt"); 
 	}
 	fclose(outfile);
 }
+void writeGTSData(int NmaxDATA, char * newDATAline)
+{
+	FILE *infile, *outfile;
+	char line[400],dummy[1000];
+    //  1 if file exists read NmaxDATA
+		 if(fileExists("gtsDATA.txt")) 
+		system("cp -r gtsDATA.txt gtsDATA0.txt");
 
+	outfile=fopen("gtsDATA.txt","w");
+   
+   fprintf(outfile,"# deviceID=%s\n",Configuration.IDdevice);
+   fprintf(outfile,"#  Position lat/lon=%s  Location: %s\n", Configuration.position,Configuration.location);
+   fprintf(outfile,"# Server=%s\n",Configuration.title);
+   fprintf(outfile,"# Time(UTC), Lev RAD (m), Battery (V)\n");
+   //04/01/2015 07:49:50, 2.776303, 0.000000, 0.000000, 2.776227, 2.777168, 0, 600, 0.000766, 0.000464, 0.000941, 6, 11.638984, -1.000000, T
+	 fprintf(outfile,"%s",newDATAline);
+	 if(fileExists("gtsDATA0.txt")) {
+		infile=fopen("gtsDATA0.txt","r");
+		int i = 0;
+		while( fgets(line, sizeof(line), infile) != NULL ) 
+		{
+			 i = i+1;
+			 if(i<=NmaxDATA && line[0] != '#')
+				fprintf(outfile,"%s",line);
+				fflush(outfile);
+			
+		}
+		fclose(infile); 
+		system("rm -f gtsDATA0.txt"); 
+	}
+	fclose(outfile);
+}  
 
 //  MATH CALCULATIONS //
 void computeFilterAverage(int n30, int n300, float fore30, float fore300, float * y30, float * y300, int * index1, float * rms1, float ratioRMS,float addRMS,float threshold, float * alertSignal1, int * alertValue1)

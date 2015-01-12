@@ -225,6 +225,10 @@ void parseLine(char * line)
 		strcpy(Configuration.location, value);
 		return;
 	}
+	 if (!strcasecmp(label,"position")) {
+		strcpy(Configuration.position, value);
+		return;
+	}
         if (!strcasecmp(label,"watchFolder")) {
 		strcpy(Configuration.watchFolder, value);
 		return;
@@ -615,7 +619,7 @@ void retryToTransmit(char * fname)
                 }
 
         int isConnected=TRUE;
-        FILE * retryStore1=fopen("retryStore1.txt", "w");
+        FILE * retryStore1=fopen("retryStorex.txt", "w");
         while( fgets(line, sizeof(line), infile) != NULL ) {
                 //printf("line x: %s\n",line);
 			if( !strstr(line, "echo") && line[0] !=10	)
@@ -638,19 +642,22 @@ void retryToTransmit(char * fname)
 							//LastTimeConnected_s = CurrentTime_s;
 							}
 					else
-                        { isConnected=FALSE ;
-						  printf("Not transmitted, stored/n");
+                        { //isConnected=FALSE ;
+						  printf("Not transmitted, stored\n");
                           fprintf(retryStore1, "%s\n",line);
+						  fflush(retryStore1);
                         }
 				}
 				else
 				     fprintf(retryStore1, "%s\n",line);
+					 fflush(retryStore1);
 			}
-        }
+        } 
         fclose(retryStore1);
 		fclose(infile);
-        if (fileExists("retryStore1.txt"))
-			sprintf(dummy,"mv retryStore1.txt %s",fname);
+        if (fileExists("retryStorex.txt"))
+			sprintf(dummy,"mv -f retryStorex.txt %s",fname);
+			printf("%s\n",dummy);
 			system(dummy);
 		
         
