@@ -7,13 +7,13 @@
 log() { echo “`date +%H:%M` – $1″ >> $LOGFILE; }
 #################################################################
 
-#REMOTE_FTP_SERVER=ftp.sportinlinea.it   			# Server where to put the Incremental Load files
-#REMOTE_FTP_USER=vvyazvbx                			# User to login at REMOTE_FTP_USER
-#REMOTE_FTP_PASSWORD=FDtXqQD2 						#Passwd for FTP usr at REMOTE_FTP_USR
+#REMOTE_FTP_SERVER=   			# Server where to put the Incremental Load files
+#REMOTE_FTP_USER=               			# User to login at REMOTE_FTP_USER
+#REMOTE_FTP_PASSWORD= 						#Passwd for FTP usr at REMOTE_FTP_USR
 
-REMOTE_FTP_SERVER=webcritech.jrc.ec.europa.eu                   # Server where to put the Incremental Load files
-REMOTE_FTP_USER=TAD_user                                        # User to login at REMOTE_FTP_USER
-REMOTE_FTP_PASSWORD=Ecml2011                                    #Passwd for FTP usr at REMOTE_FTP_USR
+REMOTE_FTP_SERVER=                   # Server where to put the Incremental Load files
+REMOTE_FTP_USER=                                        # User to login at REMOTE_FTP_USER
+REMOTE_FTP_PASSWORD=                                    #Passwd for FTP usr at REMOTE_FTP_USR
 
 if [ "$2" == "" ]
 then
